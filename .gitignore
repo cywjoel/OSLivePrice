@@ -1,0 +1,6 @@
+**/__pycache__/
+bot-env/*
+config.json
+*.log
+notebooks/
+*.ipynb
