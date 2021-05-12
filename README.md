@@ -1,6 +1,6 @@
 # OSLivePrice
 
-### A Discord bot for fetching live *Old School RuneScape* item prices
+### A Discord bot for fetching live *Old School RuneScape* item prices from the *RuneLite/OSRS Wiki* API
 
 This bot is a work in progress, and more functions will be added in due time.
 
@@ -18,3 +18,4 @@ Current functions (assume prefix is "r."):
 * r.itemsearch <search term>: returns all items which match the search term (can use spaces between terms)
 * r.latest <id>: returns latest prices for item
 * r.highalch <id>: returns high alch profit for item
+* r.topalch: returns all items with positive high alch profit
