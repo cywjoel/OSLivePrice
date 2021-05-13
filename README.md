@@ -14,8 +14,8 @@ Set your command prefix and Discord bot token and save as config.json to use the
 ```
 
 Current functions (assume prefix is "r."):
-* r.iteminfo <id>: returns basic info for item
-* r.itemsearch <search term>: returns all items which match the search term (can use spaces between terms)
+* r.info <id>: returns basic info for item
+* r.search <search term>: returns all items which match the search term (can use spaces between terms)
 * r.latest <id>: returns latest prices for item
 * r.highalch <id>: returns high alch profit for item
 * r.topalch: returns all items with positive high alch profit
