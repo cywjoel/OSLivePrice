@@ -48,21 +48,56 @@ with open('id_mapping.json') as f:                  # open id_mapping.json, so i
 async def get_item_info(ctx, id_num):               # get item info
     for d in data:                                  # d for dictionary
         if int(id_num) == d['id']:                  # if id_num == id value in dict, get the values below. refer to id_mapping.json for keys
-            item_id = d['id']
-            item_name = d['name']
-            item_shop_value = d['value']
-            item_high_alch = d['highalch']
-            item_ge_limit = d['limit']
+            if 'highalch' in d and 'limit' in d:
+                item_id = d['id']
+                item_name = d['name']
+                item_shop_value = d['value']
+                item_high_alch = d['highalch']
+                item_ge_limit = d['limit']
 
-            # create discord embed to display info using the values above (title, field)
-            result_item = discord.Embed(color = 0xddc000)        # create new embed result_item
-            result_item.title = "Data for Item ID #" + str(item_id)
-            field_value = "Shop value: " + str(item_shop_value) + "\n" + "High Level Alchemy value: " + str(item_high_alch) + "\n" + "GE buy limit: " + str(item_ge_limit)
-            result_item.add_field(name = item_name, value = field_value, inline = True)
-            image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
-            result_item.set_thumbnail(url = image_link)
+                # create discord embed to display info using the values above (title, field)
+                result_item = discord.Embed(color = 0xddc000)        # create new embed result_item
+                result_item.title = "Data for Item ID #" + str(item_id)
+                field_value = "Shop value: " + str(item_shop_value) + "\n" + "High Level Alchemy value: " + str(item_high_alch) + "\n" + "GE buy limit: " + str(item_ge_limit)
+                result_item.add_field(name = item_name, value = field_value, inline = True)
+                image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
+                result_item.set_thumbnail(url = image_link)
 
-            await ctx.send(embed = result_item)     # send the message
+                await ctx.send(embed = result_item)     # send the message
+
+            else:
+                if 'highalch' not in d:
+                    item_id = d['id']
+                    item_name = d['name']
+                    item_shop_value = d['value']
+                    item_ge_limit = d['limit']
+
+                    # create discord embed to display info using the values above (title, field)
+                    result_item = discord.Embed(color = 0xddc000)        # create new embed result_item
+                    result_item.title = "Data for Item ID #" + str(item_id)
+                    field_value = "Shop value: " + str(item_shop_value) + "\n" + "High Level Alchemy value: " + "N/A" + "\n" + "GE buy limit: " + str(item_ge_limit)
+                    result_item.add_field(name = item_name, value = field_value, inline = True)
+                    image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
+                    result_item.set_thumbnail(url = image_link)
+
+                    await ctx.send(embed = result_item)     # send the message
+
+                elif 'limit' not in d:
+                    item_id = d['id']
+                    item_name = d['name']
+                    item_shop_value = d['value']
+                    item_high_alch = d['highalch']
+
+                    # create discord embed to display info using the values above (title, field)
+                    result_item = discord.Embed(color = 0xddc000)        # create new embed result_item
+                    result_item.title = "Data for Item ID #" + str(item_id)
+                    field_value = "Shop value: " + str(item_shop_value) + "\n" + "High Level Alchemy value: " + str(item_high_alch) + "\n" + "GE buy limit: " + "N/A"
+                    result_item.add_field(name = item_name, value = field_value, inline = True)
+                    image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
+                    result_item.set_thumbnail(url = image_link)
+
+                    await ctx.send(embed = result_item)     # send the message
+
     
     if all(int(id_num) != d['id'] for d in data):   # send the "no item" message if id doesnt exist in dict
         await ctx.send('No such item id exists.')
@@ -234,28 +269,31 @@ async def get_latest_price(ctx, id_num):
 async def get_high_alch_price(ctx, id_num):
     for d in data:                                  # d for dictionary
         if int(id_num) == d['id']:                  # if id_num == id value in dict, get the values below. refer to id_mapping.json for keys
-            item_id = d['id']
-            item_name = d['name']
-            item_highalch = d['highalch']
+            if 'highalch' in d:
+                item_id = d['id']
+                item_name = d['name']
+                item_highalch = d['highalch']
 
-            item_latest = osrsreqs.get_latest(id_num)           # get input item instabuy
-            result_high = item_latest[str(id_num)]['high']
+                item_latest = osrsreqs.get_latest(id_num)           # get input item instabuy
+                result_high = item_latest[str(id_num)]['high']
 
-            nature_rune_latest = osrsreqs.get_latest('561')     # get nature rune price (nature rune id = 561)
-            nature_rune_instabuy = nature_rune_latest['561']['high']
+                nature_rune_latest = osrsreqs.get_latest('561')     # get nature rune price (nature rune id = 561)
+                nature_rune_instabuy = nature_rune_latest['561']['high']
 
-            result_item = discord.Embed(color = 0xddc000)
-            result_item.title = 'High alchemy profit for Item ID #' + str(id_num)
-            high_alch_price = 'High alch price: ' + str(item_highalch) + ' gp'
-            item_high_price = 'GE buy price: ' + str(result_high) + ' gp'
-            nature_rune_price = 'Nature rune GE price: ' + str(nature_rune_instabuy) + ' gp'
-            high_alch_gain = 'High alch profit: ' + str(item_highalch - result_high - nature_rune_instabuy) + ' gp'
-            field_value = high_alch_price + '\n' + item_high_price + '\n' + nature_rune_price + '\n' + '**' + high_alch_gain + '**'
-            image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
-            result_item.add_field(name = item_name, value = field_value, inline = True)
-            result_item.set_thumbnail(url = image_link)
+                result_item = discord.Embed(color = 0xddc000)
+                result_item.title = 'High alchemy profit for Item ID #' + str(id_num)
+                high_alch_price = 'High alch price: ' + str(item_highalch) + ' gp'
+                item_high_price = 'GE buy price: ' + str(result_high) + ' gp'
+                nature_rune_price = 'Nature rune GE price: ' + str(nature_rune_instabuy) + ' gp'
+                high_alch_gain = 'High alch profit: ' + str(item_highalch - result_high - nature_rune_instabuy) + ' gp'
+                field_value = high_alch_price + '\n' + item_high_price + '\n' + nature_rune_price + '\n' + '**' + high_alch_gain + '**'
+                image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
+                result_item.add_field(name = item_name, value = field_value, inline = True)
+                result_item.set_thumbnail(url = image_link)
 
-            await ctx.send(embed = result_item)
+                await ctx.send(embed = result_item)
+            else:
+                await ctx.send('This item cannot be alchemized.')
 
     if all(int(id_num) != d['id'] for d in data):   # send the "no item" message if id doesnt exist in dict
         await ctx.send('No such item id exists.')
@@ -430,10 +468,10 @@ async def get_profitable_high_alch(ctx):
 async def help(ctx):
     await ctx.send('**Command list:** \n' +
         '`' + config_prefix + 'info <item-id>`: Displays shop price, high alch price and GE buy limit for selected item \n' +
-        '`' + config_prefix + 'search <search-terms>`: Searches for item names that match the input terms, e.g. searching for \"mystic boots\" will return all four types of mystic boots \n' +
+        '`' + config_prefix + 'search <search-terms>`: Searches for item ids and names that match the input terms \n' +
         '`' + config_prefix + 'latest <item-id>`: Displays the latest GE prices (buy and sell), as well as profit \n' + 
         '`' + config_prefix + 'highalch <item-id>`: Displays the potential profit per high alch cast for selected item \n' + 
-        '`' + config_prefix + 'topalch`: Displays all items with positive profit per high alch cast')
+        '`' + config_prefix + 'topalch`: Displays all items with positive profit per high alch cast in descending order')
 
 ''' EVENTS -------------------------------------------- '''
 
