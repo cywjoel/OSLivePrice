@@ -14,8 +14,11 @@ Set your command prefix and Discord bot token and save as config.json to use the
 ```
 
 Current functions (assume prefix is "r."):
-* r.info <id>: returns basic info for item
-* r.search <search term>: returns all items which match the search term (can use spaces between terms)
-* r.latest <id>: returns latest prices for item
-* r.highalch <id>: returns high alch profit for item
-* r.topalch: returns all items with positive high alch profit
+* `r.info <id>`: returns basic info for item
+* `r.search <search term>`: returns all items which match the search term (can use spaces between terms)
+* `r.latest <id>`: returns latest prices for item
+* `r.highalch <id>`: returns high alch profit for item
+* `r.topalch`: returns all items with positive high alch profit
+* `r.5min <id>`: returns a chart of item's price over the last 4 hours, in 5-minute intervals
+
+*Note: Run `getmapping.py` to update the id_mapping.json.*
