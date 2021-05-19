@@ -2,8 +2,6 @@ import requests
 import json
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 
 # set user-agent function
 def set_user_agent():
@@ -65,3 +63,28 @@ def get_five_min(id, live_ts):                # time is a unix timestamp
         df_4h['timestamp'][i] = pd.Timestamp(dt, unit ='s')
     
     return df_4h
+
+# get 1-hour time series on a 2-day scale
+def get_one_hour(id, live_ts):                # time is a unix timestamp
+
+    # pull data
+    headers = set_user_agent()
+    url = "https://prices.runescape.wiki/api/v1/osrs/timeseries?timestep=1h&id=" + str(id)
+    response = requests.get(url, headers = headers)
+    print(response)
+
+    data_raw = response.json()
+    data = data_raw['data']
+
+    df = pd.DataFrame(data)
+
+    for i, ts in enumerate(df['timestamp']):
+        if ts < (live_ts - 172800):
+            df = df.drop([i])
+        
+    df_2d = df.reset_index(drop = True)
+
+    for i, dt in enumerate(df_2d['timestamp']):
+        df_2d['timestamp'][i] = pd.Timestamp(dt, unit ='s')
+    
+    return df_2d

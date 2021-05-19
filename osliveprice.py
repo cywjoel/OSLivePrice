@@ -349,6 +349,84 @@ async def get_five_min_prices(ctx, id_num):
     if all(int(id_num) != d['id'] for d in data):   # send the "no item" message if id doesnt exist in dict
         await ctx.send('No such item id exists.')
 
+# get 5-min interval data (4 hour chart)
+@bot.command(name = '1hr')
+async def get_one_hour_prices(ctx, id_num):
+    for d in data:
+        if int(id_num) == d['id']:
+            item_name = d['name']
+            live_ts = int(time.time())                      # get current time in unix
+            df = osrs.get_one_hour(id_num, live_ts)         # get live prices
+
+            if df.empty:
+                await ctx.send('Item has no GE data in the last 2 days.')
+            else:
+                # convert arrays to double
+                hi_array = np.array(df['avgHighPrice']).astype(np.double)
+                lo_array = np.array(df['avgLowPrice']).astype(np.double)
+
+                # mask NaNs
+                hi_array_m = hi_array[np.isfinite(hi_array)]            # m = masked
+                lo_array_m = lo_array[np.isfinite(lo_array)]
+
+                # timestamp to array of strings
+                tsarray = np.array(df['timestamp'])              # timestamp array
+
+                # timestamps with masking for NaN datapoints
+                hi_tsarray = tsarray[np.isfinite(hi_array)]      # for hi_array_m
+                lo_tsarray = tsarray[np.isfinite(lo_array)]      # for lo_array_m
+
+                hivolarr = np.array(df['highPriceVolume'])       # hi volume arr
+                lovolarr = np.array(df['lowPriceVolume'])        # lo volume arr
+
+                # make graph
+
+                plt.style.use('dark_background')
+
+                fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw = {'height_ratios': (2, 1)})
+
+                ax0.plot(hi_tsarray, hi_array_m, 'o-', color = '#47a0ff', linewidth = 3, label = 'instabuy price')
+                ax0.plot(lo_tsarray, lo_array_m, 'o-', color = '#ed29ff', linewidth = 3, label = 'instasell price')
+                ax0.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) 
+                ax0.yaxis.set_major_formatter(FuncFormatter(lambda y, p: format(int(y), ','))) 
+                ax0.yaxis.grid()                                    # show grid
+
+                ax0.set_ylabel('Price (gp)')                        # didn't set xlabel because viewer can read from ax1.ylabel
+                ax0.spines['top'].set_visible(False)                # setting selected graph borders to invisible
+                ax0.spines['right'].set_visible(False)
+                ax0.spines['left'].set_visible(False)
+                ax0.legend()
+
+                ax1.plot(tsarray, hivolarr, color = '#8ac2ff', label = 'instabuy vol.')
+                ax1.plot(tsarray, lovolarr, color = '#f8adff', label = 'instasell vol.')
+
+                ax1.set_xlabel('Date/Time')
+                ax1.set_ylabel('Volume')
+                ax1.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) 
+                ax1.yaxis.set_major_formatter(FuncFormatter(lambda y, p: format(int(y), ','))) 
+                ax1.yaxis.grid()
+                ax1.legend()
+
+                if not os.path.exists('/images'):
+                    os.makedirs('/images')
+
+                plt.savefig('images/1h_graph.png')                      # save graph
+                plt.close(fig)                                          # close graph
+
+                # now we open and prepare to upload graph
+                with open('images/1h_graph.png', 'rb') as img:
+                    graph = discord.File(img, filename = '1h_graph.png')
+
+                # make embed
+                result_item = discord.Embed(color = 0xddc000)
+                result_item.title = "1-hour interval chart for Item ID #" + str(id_num)
+                result_item.add_field(name = item_name, value = 'Last 2 days')
+                result_item.set_image(url = 'attachment://1h_graph.png')
+                await ctx.send(file = graph, embed = result_item)
+        
+    if all(int(id_num) != d['id'] for d in data):   # send the "no item" message if id doesnt exist in dict
+        await ctx.send('No such item id exists.')
+
 # get high alch profit
 @bot.command(name = 'highalch')
 async def get_high_alch_price(ctx, id_num):
@@ -557,7 +635,8 @@ async def help(ctx):
         '`' + config_prefix + 'latest <item-id>`: Displays the latest GE prices (buy and sell), as well as profit \n' + 
         '`' + config_prefix + 'highalch <item-id>`: Displays the potential profit per high alch cast for selected item \n' + 
         '`' + config_prefix + 'topalch`: Displays all items with positive profit per high alch cast in descending order \n' +
-        '`' + config_prefix + '5min <item-id>`: Displays a chart of then item\'s prices over the last 4 hours, at 5 minute intervals')
+        '`' + config_prefix + '5min <item-id>`: Displays a chart of then item\'s prices over the last 4 hours, at 5-minute intervals \n' +
+        '`' + config_prefix + '1hr <item-id>`: Displays a chart of then item\'s prices over the last 2 days, at 1-hour intervals')
 
 ''' EVENTS -------------------------------------------- '''
 
