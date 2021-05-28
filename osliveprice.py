@@ -74,20 +74,36 @@ async def get_item_info(ctx, id_num):               # get item info
 
             else:
                 if 'highalch' not in d:
-                    item_id = d['id']
-                    item_name = d['name']
-                    item_shop_value = d['value']
-                    item_ge_limit = d['limit']
+                    if 'limit' not in d:
+                        item_id = d['id']
+                        item_name = d['name']
+                        item_shop_value = d['value']
 
-                    # create discord embed to display info using the values above (title, field)
-                    result_item = discord.Embed(color = 0xddc000)        # create new embed result_item
-                    result_item.title = "Data for Item ID #" + str(item_id)
-                    field_value = "Shop value: " + str(item_shop_value) + "\n" + "High Level Alchemy value: " + "N/A" + "\n" + "GE buy limit: " + str(item_ge_limit)
-                    result_item.add_field(name = item_name, value = field_value, inline = True)
-                    image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
-                    result_item.set_thumbnail(url = image_link)
+                        # create discord embed to display info using the values above (title, field)
+                        result_item = discord.Embed(color = 0xddc000)        # create new embed result_item
+                        result_item.title = "Data for Item ID #" + str(item_id)
+                        field_value = "Shop value: " + str(item_shop_value) + "\n" + "High Level Alchemy value: " + "N/A" + "\n" + "GE buy limit: " + "N/A"
+                        result_item.add_field(name = item_name, value = field_value, inline = True)
+                        image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
+                        result_item.set_thumbnail(url = image_link)
 
-                    await ctx.send(embed = result_item)     # send the message
+                        await ctx.send(embed = result_item)     # send the message
+
+                    else:
+                        item_id = d['id']
+                        item_name = d['name']
+                        item_shop_value = d['value']
+                        item_ge_limit = d['limit']
+
+                        # create discord embed to display info using the values above (title, field)
+                        result_item = discord.Embed(color = 0xddc000)        # create new embed result_item
+                        result_item.title = "Data for Item ID #" + str(item_id)
+                        field_value = "Shop value: " + str(item_shop_value) + "\n" + "High Level Alchemy value: " + "N/A" + "\n" + "GE buy limit: " + str(item_ge_limit)
+                        result_item.add_field(name = item_name, value = field_value, inline = True)
+                        image_link = 'https://secure.runescape.com/m=itemdb_oldschool/obj_big.gif?id=' + str(id_num)
+                        result_item.set_thumbnail(url = image_link)
+
+                        await ctx.send(embed = result_item)     # send the message
 
                 elif 'limit' not in d:
                     item_id = d['id']
@@ -104,7 +120,6 @@ async def get_item_info(ctx, id_num):               # get item info
                     result_item.set_thumbnail(url = image_link)
 
                     await ctx.send(embed = result_item)     # send the message
-
     
     if all(int(id_num) != d['id'] for d in data):   # send the "no item" message if id doesnt exist in dict
         await ctx.send('No such item id exists.')
