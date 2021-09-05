@@ -2,8 +2,6 @@
 
 ### A Discord bot for fetching live *Old School RuneScape* item prices from the *RuneLite/OSRS Wiki* API
 
-This bot is a work in progress, and more functions will be added in due time.
-
 Set your command prefix and Discord bot token and save as config.json to use the bot:
 
 ```
